@@ -8,14 +8,14 @@ class Trial:
         self.data = None
         self.human_id = self.get_human_id()
         self.videos = self.get_videos()
-        self.session_id = int(path.split('/')[-2])
+        self.session_id = int(path.split('/')[-2]) - 1
         print(f"Loaded list of videos: {self.videos}")
 
     def load_data(self):
         return loadmat(self.path)
 
     def get_human_id(self):
-        return self.path.split('/')[-1].split('_')[0]
+        return int(self.path.split('/')[-1].split('_')[0]) - 1
     
     def get_videos(self):
         if self.data is None:

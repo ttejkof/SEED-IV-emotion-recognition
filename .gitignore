@@ -1,1 +1,4 @@
 SEED-IV/
+
+# ignore pycache
+**/__pycache__

@@ -2,3 +2,7 @@ SEED-IV/
 
 # ignore pycache
 **/__pycache__
+radovi/
+features/
+all_features.npy
+human_params.pkl

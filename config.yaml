@@ -1,0 +1,20 @@
+features:
+  var: true
+  msv: true
+  hjorth_mobility: true
+  hjorth_complexity: true
+  p2p: true
+  aprox_entropy: true
+  c0: true
+  power_sum: true
+  spectral_max: true
+  spectral_max_freq: true
+
+filter:
+  low_freq: 0.5
+  high_freq: 50
+
+normalize_params: human_params.pkl
+Fs: 200
+min_time: 40
+epoch_time: 8

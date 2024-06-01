@@ -41,11 +41,11 @@ def eeg_filter(mne_data, low_freq, high_freq):
     return mne_data.copy().filter(low_freq, high_freq, 'eeg')
 
 # %%
-def split_abgd(eeg_data):
-    eeg_alfa = eeg_data.copy().filter(8, 15, 'eeg')
-    eeg_beta = eeg_data.copy().filter(16, 31, 'eeg')
+def split_abgd(eeg_data: mne.io.RawArray):
+    eeg_alfa = eeg_data.copy().filter(8, 16, 'eeg')
+    eeg_beta = eeg_data.copy().filter(16, 32, 'eeg')
     eeg_gamma = eeg_data.copy().filter(32, 45, 'eeg')
-    eeg_teta = eeg_data.copy().filter(4, 7, 'eeg')
+    eeg_teta = eeg_data.copy().filter(4, 8, 'eeg')
     return eeg_alfa, eeg_beta, eeg_gamma, eeg_teta
 
 
@@ -53,25 +53,6 @@ def split_abgd(eeg_data):
 import scipy.signal
 
 Fs = 200
-def peak2peak(channel):
-    poz_pik, mag_pik = mne.preprocessing.peak_finder(channel) #90
-    Ts = 1/Fs
-    prvo = Ts*poz_pik[1:]
-    drugo = Ts*poz_pik[0:-1]
-    razlika = prvo - drugo
-    PTP = np.mean(razlika)
-    return PTP
-
-# Ovo treba proveriti
-def calculate_c0(x):
-    X = np.fft.fft(x, axis=-1)
-    M = np.mean(np.abs(X)**2, axis=-1)
-    Y = np.where(X > M, X, 0)
-    y = np.fft.ifft(Y, axis=-1)
-    A1 = np.sum((x - y)**2, axis=-1)
-    A0 = np.sum(x**2, axis=-1)
-    return A1 / A0
-
 # %%
 # min_time = min(data.shape[1] for data, label, ids in iterate_all(dataset)) / Fs
 # min_time = min_time // 5 * 5 # da se zaokruzi na lepe brojeve
@@ -124,8 +105,6 @@ for wanted_human_id in range(start_humain_id, 16, 5):
                 svd_entropy = mne_features.univariate.compute_svd_entropy(eeg_band_data)
                 spectral_entropy = mne_features.univariate.compute_spect_entropy(Fs, eeg_band_data)
                 permutation_entropy = np.apply_along_axis(antropy.perm_entropy, 1, eeg_band_data, normalize=True)
-                # Ovo nesto zeza vraca dva broja ali ne znam sta su
-                # kolmogorov_entropy = np.apply_along_axis(lambda x: EntropyHub.K2En(x)[0], 1, eeg_band_data)
                 feature_list = [var, msv, hjorth_mobility, hjorth_complexity, p2p, aprox_entropy, c0, svd_entropy, spectral_entropy, permutation_entropy]
                 features[session_id-1, human_id-1, video_id-1, epoch_id, band_id] = np.abs(np.stack(feature_list, axis=-1)).astype(np.float32)
         print(f"Time elapsed: {time.time() - start}")

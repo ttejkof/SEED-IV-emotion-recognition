@@ -7,66 +7,23 @@ from tqdm import tqdm
 import pickle
 import argparse
 
-args_parser = argparse.ArgumentParser()
-args_parser.add_argument("--human_id", type=int, default=1)
-args = args_parser.parse_args()
-wanted_human_id = args.human_id
-
-# %%
-
 from utils.data import iterate_all, get_feature_shape, iterate_human
 from utils.data import Dataset
-dataset: Dataset = Dataset.get_dataset(reload=False)
+from utils.config_utils import parse_config
 
-# %%
+
+
+
 human_params = pickle.load(open('human_params.pkl', 'rb'))
-
-# %%
 montage = mne.channels.read_custom_montage(r'SEED-IV/channel_62_pos.locs')
 
-# %%
-def convert_np2mne(data: np.ndarray):
-    n_channels = 62
-    sampling_freq = 200  # in Hertz
-    info = mne.create_info(n_channels, sfreq=sampling_freq)
-    ch_names = ["Fp1", "Fpz", "Fp2", "AF3", "AF4", "F7", "F5", "F3", "F1", "Fz", "F2", "F4", "F6", "F8", "FT7", "FC5", "FC3", "FC1", "FCz", "FC2", "FC4", "FC6", "FT8", "T7", "C5", "C3", "C1", "Cz", "C2", "C4", "C6", "T8", "TP7", "CP5", "CP3", "CP1", "CPz", "CP2", "CP4", "CP6", "TP8", "P7", "P5", "P3", "P1", "Pz", "P2", "P4", "P6", "P8", "PO7", "PO5", "PO3", "POz", "PO4", "PO6", "PO8", "CB1", "O1", "Oz", "O2", "CB2"]
-    ch_types = ["eeg"]*62
-    info = mne.create_info(ch_names, ch_types=ch_types, sfreq=sampling_freq)
-    eeg = mne.io.RawArray(data/1e6, info)
-    eeg.set_montage(montage)
-    return eeg
-
-# %%
-def eeg_filter(mne_data, low_freq, high_freq):
-    return mne_data.copy().filter(low_freq, high_freq, 'eeg')
-
-# %%
-def split_abgd(eeg_data: mne.io.RawArray):
-    eeg_alfa = eeg_data.copy().filter(8, 16, 'eeg')
-    eeg_beta = eeg_data.copy().filter(16, 32, 'eeg')
-    eeg_gamma = eeg_data.copy().filter(32, 45, 'eeg')
-    eeg_teta = eeg_data.copy().filter(4, 8, 'eeg')
-    return eeg_alfa, eeg_beta, eeg_gamma, eeg_teta
 
 
-# %%
+
 import scipy.signal
 
 Fs = 200
-# %%
-# min_time = min(data.shape[1] for data, label, ids in iterate_all(dataset)) / Fs
-# min_time = min_time // 5 * 5 # da se zaokruzi na lepe brojeve
-
-# %%
 min_time = 40 # OVo treba proveriti
-
-# %%
-import mne_features
-import antropy
-import EntropyHub
-import time
-
-# %%
 # Treba razmisliiti da li ima smisla da za svaki band pravimo posebne feature
 # pod band_id mislim na alpha, beta, gamma, delta
 # (session_id, human_id, video_id, epoch_id, band_id, channel_id, feature_id)

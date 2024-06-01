@@ -3,6 +3,12 @@ import mne
 import pickle
 import numpy as np
 import scipy
+def interpolate(raw):
+    raw.info["bads"].extend(["Fp1", "Fpz", "Fp2", "AF3","AF4", "Fz", "F5", "F3","F1", "F7","FC5","FC3","FC1" ])  
+    #sumoviti kanali - interpoliranje
+    eeg_data_interp = raw.copy().interpolate_bads(reset_bads=True)
+    return eeg_data_interp
+
 def apply_ica(raw):
     
     ica = ICA(n_components=20, random_state=97, method='fastica')
@@ -20,8 +26,10 @@ def apply_ica(raw):
     # Mark EOG components for exclusion
     ica.exclude = eog_inds
 
-    # Apply the ICA solution to the raw data
+    # Apply the ICA solution to the raw dataz1z
     raw_clean = ica.apply(raw.copy())
+    raw_clean.drop_channels(['EOG'])
+
     return raw_clean
 
 def eeg_filter(mne_data, low_freq, high_freq):

@@ -1,7 +1,7 @@
 
 from utils import iterate_all, Dataset
 from utils.config_utils import parse_config
-from utils.preprocessing import apply_ica, convert_np2mne, eeg_filter, split_abgd, normalize
+from utils.preprocessing import apply_ica, convert_np2mne, eeg_filter, split_abgd, normalize, interpolate
 from utils.features import get_feature_lambdas
 import time
 import numpy as np
@@ -14,7 +14,7 @@ def preprocess(signal, ids, config):
     normalized_signal = normalize(signal, ids, config)
     mne_signal = convert_np2mne(normalized_signal)
     filtered_signal = eeg_filter(mne_signal, **config['filter'])
-    # filtered_signal_wo_eog = apply_ica(filtered_signal)
+    filtered_signal_wo_eog = interpolate(filtered_signal)
     return filtered_signal.get_data()
 
 def split_epochs(signal, config):
@@ -55,6 +55,10 @@ def main():
     config = parse_config("config.yaml")
     mne.set_log_level("WARNING")
 
+    for data, label, ids in iterate_all(dataset):
+        process_trial(data, ids, config)
+        break
+
     # Create a pool of worker processes
     pool = mp.Pool(10)
     total_items = 1080
@@ -64,16 +68,6 @@ def main():
     for result in pool.imap_unordered(process_video_wrapper, ((data, ids, config) for data, label, ids in iterate_all(dataset))):
         progress_bar.update(1)
 
-
-    # np.save("all_features.npy", all_features)
-
-    # dimension_reduction(all_features)
-
-    # train_test_split(all_features)
-
-    # train_model()
-
-    # test_model()
 
     pass
 

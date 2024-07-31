@@ -55,9 +55,9 @@ def main():
     config = parse_config("config.yaml")
     mne.set_log_level("WARNING")
 
-    for data, label, ids in iterate_all(dataset):
-        process_trial(data, ids, config)
-        break
+    # for data, label, ids in iterate_all(dataset):
+    #     process_trial(data, ids, config)
+    #     break
 
     # Create a pool of worker processes
     pool = mp.Pool(10)

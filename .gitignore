@@ -3,5 +3,5 @@ SEED-IV/
 # ignore pycache
 **/__pycache__
 radovi/
-data/
+/data/
 papers/

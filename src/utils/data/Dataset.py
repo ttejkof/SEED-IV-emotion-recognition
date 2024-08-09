@@ -21,6 +21,7 @@ class Dataset:
     def __init__(self, path='SEED-IV/eeg_raw_data') -> None:
         self.raw_eeg_path = path
         self.sessions = []
+        print(os.listdir("./"))
         sessions = os.listdir(self.raw_eeg_path)
         sessions = sorted(sessions, key=lambda x: int(x))
         for session in sessions:

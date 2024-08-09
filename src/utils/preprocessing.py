@@ -52,12 +52,13 @@ def split_abgd(signal):
         b, a = scipy.signal.butter(order, [low, high], btype='band')
         bands.append(scipy.signal.filtfilt(b, a, signal, axis=-1))
     bands = np.array(bands)
+    # return bands.transpose(0, 1, 2)
+    return bands
 
-    return bands.transpose(1, 0, 2, 3)
-
-human_params = pickle.load(open('human_params.pkl', 'rb'))
 
 def normalize(signal, ids, config):
+    human_params = pickle.load(open('human_params.pkl', 'rb'))
+
     session_id, human_id, video_id = ids
     signal -= human_params[human_id][0][:, None]
     signal /= human_params[human_id][1][:, None]
